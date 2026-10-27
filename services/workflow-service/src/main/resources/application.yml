@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: workflow-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/loan_platform?currentSchema=workflow}
+    username: ${SPRING_DATASOURCE_USERNAME:workflow_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:workflow_password}
+  flyway:
+    default-schema: workflow
+    schemas: workflow
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: workflow-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+platform:
+  kafka:
+    topics:
+      loan-application-events: loan.application.events.v1
+server:
+  port: ${SERVER_PORT:8082}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true

@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: scoring-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/loan_platform?currentSchema=scoring}
+    username: ${SPRING_DATASOURCE_USERNAME:scoring_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:scoring_password}
+  flyway:
+    default-schema: scoring
+    schemas: scoring
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+server:
+  port: ${SERVER_PORT:8083}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+

@@ -1,0 +1,110 @@
+name: loan-platform
+
+services:
+  postgres:
+    image: postgres:17.11-alpine3.24
+    environment:
+      POSTGRES_USER: platform_admin
+      POSTGRES_PASSWORD: ${POSTGRES_SUPERUSER_PASSWORD:-platform_admin_password}
+      POSTGRES_DB: loan_platform
+      LOAN_APPLICATION_DB_PASSWORD: ${LOAN_APPLICATION_DB_PASSWORD:-loan_application_password}
+      WORKFLOW_DB_PASSWORD: ${WORKFLOW_DB_PASSWORD:-workflow_password}
+      SCORING_DB_PASSWORD: ${SCORING_DB_PASSWORD:-scoring_password}
+      NOTIFICATION_DB_PASSWORD: ${NOTIFICATION_DB_PASSWORD:-notification_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/init/001-create-service-schemas.sh:/docker-entrypoint-initdb.d/001-create-service-schemas.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U platform_admin -d loan_platform"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  kafka:
+    image: apache/kafka:4.1.2
+    ports:
+      - "9092:9092"
+
+  redis:
+    image: redis:8.2.3-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  loan-application-service:
+    build:
+      context: .
+      dockerfile: services/loan-application-service/Dockerfile
+    environment:
+      SERVER_PORT: 8081
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/loan_platform?currentSchema=loan_application
+      SPRING_DATASOURCE_USERNAME: loan_application_user
+      SPRING_DATASOURCE_PASSWORD: ${LOAN_APPLICATION_DB_PASSWORD:-loan_application_password}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  workflow-service:
+    build:
+      context: .
+      dockerfile: services/workflow-service/Dockerfile
+    environment:
+      SERVER_PORT: 8082
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/loan_platform?currentSchema=workflow
+      SPRING_DATASOURCE_USERNAME: workflow_user
+      SPRING_DATASOURCE_PASSWORD: ${WORKFLOW_DB_PASSWORD:-workflow_password}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - "8082:8082"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+  scoring-service:
+    build:
+      context: .
+      dockerfile: services/scoring-service/Dockerfile
+    environment:
+      SERVER_PORT: 8083
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/loan_platform?currentSchema=scoring
+      SPRING_DATASOURCE_USERNAME: scoring_user
+      SPRING_DATASOURCE_PASSWORD: ${SCORING_DB_PASSWORD:-scoring_password}
+    ports:
+      - "8083:8083"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: services/notification-service/Dockerfile
+    environment:
+      SERVER_PORT: 8084
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/loan_platform?currentSchema=notification
+      SPRING_DATASOURCE_USERNAME: notification_user
+      SPRING_DATASOURCE_PASSWORD: ${NOTIFICATION_DB_PASSWORD:-notification_password}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - "8084:8084"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+
+volumes:
+  postgres-data:
