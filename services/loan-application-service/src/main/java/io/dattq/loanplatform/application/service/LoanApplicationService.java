@@ -1,11 +1,12 @@
 package io.dattq.loanplatform.application.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import io.dattq.loanplatform.application.api.CreateLoanApplicationRequest;
 import io.dattq.loanplatform.application.api.LoanApplicationView;
 import io.dattq.loanplatform.application.api.SubmitLoanApplicationRequest;
 import io.dattq.loanplatform.application.api.UpdateLoanApplicationRequest;
+import io.dattq.loanplatform.application.domain.ApplicationStatus;
 import io.dattq.loanplatform.application.domain.LoanApplication;
 import io.dattq.loanplatform.application.domain.LoanProduct;
 import io.dattq.loanplatform.application.domain.OutboxEvent;
@@ -67,6 +68,7 @@ public class LoanApplicationService {
     public LoanApplicationView updateDraft(UUID applicationId, String actorId, UpdateLoanApplicationRequest request) {
         LoanApplication application = ownedApplication(applicationId, actorId);
         assertVersion(application, request.version());
+        assertDraft(application);
         LoanProduct product = requiredProduct(request.productCode());
         validateAgainstProduct(product, request.requestedAmount(), request.tenorMonths());
         requireOwner(actorId, request.applicant().customerId());
@@ -85,6 +87,7 @@ public class LoanApplicationService {
     public LoanApplicationView submit(UUID applicationId, String actorId, SubmitLoanApplicationRequest request) {
         LoanApplication application = ownedApplication(applicationId, actorId);
         assertVersion(application, request.version());
+        assertDraft(application);
         validateAgainstProduct(application.getProduct(), application.getRequestedAmount(), application.getTenorMonths());
         if (!Boolean.TRUE.equals(request.confirmedTerms())) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Terms must be confirmed before submission");
@@ -146,6 +149,12 @@ public class LoanApplicationService {
         }
     }
 
+    private void assertDraft(LoanApplication application) {
+        if (application.getApplicationStatus() != ApplicationStatus.DRAFT) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Only DRAFT applications can be changed or submitted");
+        }
+    }
+
     private void requireOwner(String actorId, String ownerCustomerId) {
         if (!actorId.equals(ownerCustomerId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Application belongs to another customer");
@@ -160,7 +169,7 @@ public class LoanApplicationService {
     private String serialize(ApplicationSubmittedEvent event) {
         try {
             return objectMapper.writeValueAsString(event);
-        } catch (JsonProcessingException exception) {
+        } catch (JacksonException exception) {
             throw new IllegalStateException("Unable to serialize application event", exception);
         }
     }

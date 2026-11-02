@@ -1,6 +1,6 @@
 package io.dattq.loanplatform.workflow.event;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.dattq.loanplatform.workflow.domain.WorkflowCase;
 import io.dattq.loanplatform.workflow.repository.ProcessedEventRepository;
 import io.dattq.loanplatform.workflow.repository.WorkflowCaseRepository;

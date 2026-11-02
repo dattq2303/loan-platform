@@ -21,7 +21,7 @@ public class NotificationController {
     }
 
     @GetMapping
-    public List<NotificationView> list(@RequestParam String customerId) {
+    public List<NotificationView> list(@RequestParam("customerId") String customerId) {
         return repository.findByCustomerIdOrderByCreatedAtDesc(customerId).stream()
                 .map(notification -> new NotificationView(notification.getNotificationId(), notification.getApplicationId(),
                         notification.getCustomerId(), notification.getNotificationType(), notification.getMessage(),

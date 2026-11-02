@@ -22,7 +22,7 @@ public class WorkflowCaseController {
     }
 
     @GetMapping("/{applicationId}")
-    public WorkflowCaseView get(@PathVariable UUID applicationId) {
+    public WorkflowCaseView get(@PathVariable("applicationId") UUID applicationId) {
         WorkflowCase workflowCase = repository.findByApplicationId(applicationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Workflow case not found"));
         return new WorkflowCaseView(workflowCase.getApplicationId(), workflowCase.getApplicationNo(),

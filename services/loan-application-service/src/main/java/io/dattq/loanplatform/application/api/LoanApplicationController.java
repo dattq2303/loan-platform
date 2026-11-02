@@ -36,7 +36,7 @@ public class LoanApplicationController {
     }
 
     @GetMapping("/loan-products/{productCode}")
-    public LoanProductView product(@PathVariable String productCode) {
+    public LoanProductView product(@PathVariable("productCode") String productCode) {
         LoanProduct product = productRepository.findByProductCode(productCode)
                 .filter(LoanProduct::isActive)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Loan product not found"));
@@ -50,20 +50,20 @@ public class LoanApplicationController {
     }
 
     @PutMapping("/loan-applications/{applicationId}")
-    public LoanApplicationView update(@PathVariable UUID applicationId,
+    public LoanApplicationView update(@PathVariable("applicationId") UUID applicationId,
                                       @RequestHeader(value = "X-Actor-Id", required = false) String actorId,
                                       @Valid @RequestBody UpdateLoanApplicationRequest request) {
         return applicationService.updateDraft(applicationId, actor(actorId), request);
     }
 
     @GetMapping("/loan-applications/{applicationId}")
-    public LoanApplicationView get(@PathVariable UUID applicationId,
+    public LoanApplicationView get(@PathVariable("applicationId") UUID applicationId,
                                    @RequestHeader(value = "X-Actor-Id", required = false) String actorId) {
         return applicationService.get(applicationId, actor(actorId));
     }
 
     @PostMapping("/loan-applications/{applicationId}/submit")
-    public LoanApplicationView submit(@PathVariable UUID applicationId,
+    public LoanApplicationView submit(@PathVariable("applicationId") UUID applicationId,
                                       @RequestHeader(value = "X-Actor-Id", required = false) String actorId,
                                       @Valid @RequestBody SubmitLoanApplicationRequest request) {
         return applicationService.submit(applicationId, actor(actorId), request);

@@ -1,6 +1,6 @@
 package io.dattq.loanplatform.notification.event;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.dattq.loanplatform.notification.domain.Notification;
 import io.dattq.loanplatform.notification.repository.NotificationRepository;
 import io.dattq.loanplatform.notification.repository.ProcessedEventRepository;
