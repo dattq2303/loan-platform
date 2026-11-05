@@ -8,20 +8,35 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
+/**
+ * Lịch sử thông báo được tạo từ sự kiện nghiệp vụ; việc gửi thực tế sẽ được mở rộng sau.
+ */
 @Entity
 @Table(name = "notification")
 public class Notification {
     @Id
     @Column(name = "notification_id")
+
     private UUID notificationId;
+
     @Column(name = "application_id")
+
+    // Tham chiếu kỹ thuật đến hồ sơ vay phát sinh thông báo.
     private UUID applicationId;
+
     @Column(name = "customer_id")
+
     private String customerId;
+
     @Column(name = "notification_type")
+
     private String notificationType;
+
+
     private String message;
+
     @Column(name = "created_at")
+
     private Instant createdAt;
 
     protected Notification() {

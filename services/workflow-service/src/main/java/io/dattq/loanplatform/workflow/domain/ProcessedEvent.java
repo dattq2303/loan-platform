@@ -7,11 +7,15 @@ import jakarta.persistence.Table;
 
 import java.util.UUID;
 
+/**
+ * Bản ghi chống xử lý trùng lặp khi Kafka giao lại sự kiện cho workflow.
+ */
 @Entity
 @Table(name = "processed_event")
 public class ProcessedEvent {
     @Id
     @Column(name = "event_id")
+
     private UUID eventId;
 
     protected ProcessedEvent() {

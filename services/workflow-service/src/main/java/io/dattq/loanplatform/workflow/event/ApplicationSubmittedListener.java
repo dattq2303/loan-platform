@@ -36,7 +36,15 @@ public class ApplicationSubmittedListener {
         workflowCaseRepository.save(new WorkflowCase(event.applicationId(), event.applicationNo(), event.customerId()));
     }
 
-    private record ApplicationSubmittedEvent(UUID eventId, String eventType, UUID applicationId,
-                                             String applicationNo, String customerId) {
+    /**
+     * Phần dữ liệu tối thiểu workflow cần từ sự kiện nộp hồ sơ.
+     */
+    private record ApplicationSubmittedEvent(
+            UUID eventId,
+            String eventType,
+            UUID applicationId,
+            String applicationNo,
+            String customerId
+    ) {
     }
 }

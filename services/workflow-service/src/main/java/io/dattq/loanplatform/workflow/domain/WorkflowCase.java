@@ -8,21 +8,36 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 
+/**
+ * Hồ sơ tiếp nhận của workflow, độc lập với aggregate hồ sơ vay ở service khác.
+ */
 @Entity
 @Table(name = "workflow_case")
 public class WorkflowCase {
     @Id
     @Column(name = "workflow_case_id")
+
     private UUID workflowCaseId;
+
     @Column(name = "application_id")
+
+    // Chỉ giữ khóa tham chiếu qua hợp đồng sự kiện, không tạo quan hệ JPA liên service.
     private UUID applicationId;
+
     @Column(name = "application_no")
+
     private String applicationNo;
+
     @Column(name = "customer_id")
+
     private String customerId;
+
     @Column(name = "case_status")
+
     private String caseStatus;
+
     @Column(name = "created_at")
+
     private Instant createdAt;
 
     protected WorkflowCase() {

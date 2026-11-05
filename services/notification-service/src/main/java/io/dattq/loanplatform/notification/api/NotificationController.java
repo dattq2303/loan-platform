@@ -1,34 +1,24 @@
 package io.dattq.loanplatform.notification.api;
 
-import io.dattq.loanplatform.notification.domain.Notification;
-import io.dattq.loanplatform.notification.repository.NotificationRepository;
+import io.dattq.loanplatform.notification.service.NotificationQueryService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/notifications")
 public class NotificationController {
-    private final NotificationRepository repository;
+    private final NotificationQueryService notificationQueryService;
 
-    public NotificationController(NotificationRepository repository) {
-        this.repository = repository;
+    public NotificationController(NotificationQueryService notificationQueryService) {
+        this.notificationQueryService = notificationQueryService;
     }
 
     @GetMapping
     public List<NotificationView> list(@RequestParam("customerId") String customerId) {
-        return repository.findByCustomerIdOrderByCreatedAtDesc(customerId).stream()
-                .map(notification -> new NotificationView(notification.getNotificationId(), notification.getApplicationId(),
-                        notification.getCustomerId(), notification.getNotificationType(), notification.getMessage(),
-                        notification.getCreatedAt()))
-                .toList();
+        return notificationQueryService.getByCustomerId(customerId);
     }
-
-    public record NotificationView(UUID notificationId, UUID applicationId, String customerId,
-                                   String type, String message, Instant createdAt) { }
 }

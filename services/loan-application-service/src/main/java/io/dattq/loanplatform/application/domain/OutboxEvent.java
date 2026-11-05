@@ -12,29 +12,53 @@ import org.hibernate.type.SqlTypes;
 import java.time.Instant;
 import java.util.UUID;
 
+/**
+ * Sự kiện cần phát ra Kafka, được lưu cùng transaction nghiệp vụ để tránh mất sự kiện.
+ */
 @Entity
 @Table(name = "outbox_event")
 public class OutboxEvent {
     @Id
     @Column(name = "event_id")
+
+    // ID này phải trùng eventId trong payload để consumer có thể khử trùng lặp.
     private UUID eventId;
+
     @Column(name = "aggregate_id")
+
     private UUID aggregateId;
+
     @Column(name = "event_type")
+
     private String eventType;
+
+
     private String topic;
+
     @Column(name = "event_key")
+
     private String eventKey;
+
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
+
     private String payload;
+
     @Enumerated(EnumType.STRING)
+
+    // PENDING được publisher nhận xử lý; PUBLISHED chỉ được ghi sau khi Kafka xác nhận.
     private OutboxStatus status;
+
     @Column(name = "attempt_count")
+
     private int attemptCount;
+
     @Column(name = "occurred_at")
+
     private Instant occurredAt;
+
     @Column(name = "published_at")
+
     private Instant publishedAt;
 
     protected OutboxEvent() {

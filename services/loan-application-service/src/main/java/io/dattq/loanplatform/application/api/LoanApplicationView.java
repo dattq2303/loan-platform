@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
+/**
+ * Thông tin hồ sơ vay an toàn để trả về cho chủ sở hữu hiện tại.
+ */
 public record LoanApplicationView(
         UUID applicationId,
         String applicationNo,

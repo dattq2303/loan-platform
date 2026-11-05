@@ -8,6 +8,9 @@ import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
+/**
+ * Dữ liệu tạo bản nháp hồ sơ vay mới.
+ */
 public record CreateLoanApplicationRequest(
         @NotBlank String productCode,
         @NotNull @DecimalMin("0.01") BigDecimal requestedAmount,

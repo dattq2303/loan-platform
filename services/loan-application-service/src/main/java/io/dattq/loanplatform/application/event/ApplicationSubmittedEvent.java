@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
+/**
+ * Sự kiện phát sau khi hồ sơ chuyển từ DRAFT sang SUBMITTED.
+ */
 public record ApplicationSubmittedEvent(
         UUID eventId,
         String eventType,

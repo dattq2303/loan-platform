@@ -1,8 +1,7 @@
 package io.dattq.loanplatform.application.api;
 
-import io.dattq.loanplatform.application.domain.LoanProduct;
-import io.dattq.loanplatform.application.repository.LoanProductRepository;
 import io.dattq.loanplatform.application.service.LoanApplicationService;
+import io.dattq.loanplatform.application.service.LoanProductService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,30 +22,31 @@ import java.util.UUID;
 @RequestMapping("/api/v1")
 public class LoanApplicationController {
     private final LoanApplicationService applicationService;
-    private final LoanProductRepository productRepository;
+    private final LoanProductService productService;
 
-    public LoanApplicationController(LoanApplicationService applicationService, LoanProductRepository productRepository) {
+    public LoanApplicationController(
+            LoanApplicationService applicationService,
+            LoanProductService productService
+    ) {
         this.applicationService = applicationService;
-        this.productRepository = productRepository;
+        this.productService = productService;
     }
 
     @GetMapping("/loan-products")
     public List<LoanProductView> products() {
-        return productRepository.findAll().stream().filter(LoanProduct::isActive).map(this::toProductView).toList();
+        return productService.getActiveProducts();
     }
 
     @GetMapping("/loan-products/{productCode}")
     public LoanProductView product(@PathVariable("productCode") String productCode) {
-        LoanProduct product = productRepository.findByProductCode(productCode)
-                .filter(LoanProduct::isActive)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Loan product not found"));
-        return toProductView(product);
+        return productService.getActiveProduct(productCode);
     }
 
     @PostMapping("/loan-applications")
     public ResponseEntity<LoanApplicationView> create(@RequestHeader(value = "X-Actor-Id", required = false) String actorId,
                                                        @Valid @RequestBody CreateLoanApplicationRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(applicationService.createDraft(actor(actorId), request));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(applicationService.createDraft(actor(actorId), request));
     }
 
     @PutMapping("/loan-applications/{applicationId}")
@@ -74,10 +74,5 @@ public class LoanApplicationController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "X-Actor-Id is required in local development");
         }
         return actorId;
-    }
-
-    private LoanProductView toProductView(LoanProduct product) {
-        return new LoanProductView(product.getProductCode(), product.getName(), product.getMinAmount(),
-                product.getMaxAmount(), product.getMinTenorMonths(), product.getMaxTenorMonths());
     }
 }

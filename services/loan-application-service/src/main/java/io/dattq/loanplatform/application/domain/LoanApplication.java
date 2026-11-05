@@ -18,37 +18,70 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
 
+/**
+ * Aggregate gốc quản lý vòng đời hồ sơ vay của khách hàng.
+ */
 @Entity
 @Table(name = "loan_application")
 public class LoanApplication {
     @Id
     @Column(name = "application_id")
+
+    // UUID ổn định để dùng trong API và sự kiện liên dịch vụ.
     private UUID applicationId;
+
     @Column(name = "application_no")
+
+    // Mã nghiệp vụ có thể hiển thị cho khách hàng và vận hành.
     private String applicationNo;
+
     @Column(name = "owner_customer_id")
+
+    // Chủ sở hữu được dùng để kiểm tra quyền thao tác với bản nháp.
     private String ownerCustomerId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
+
     private LoanProduct product;
+
     @Column(name = "requested_amount")
+
     private BigDecimal requestedAmount;
+
     @Column(name = "tenor_months")
+
     private int tenorMonths;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "application_status")
+
+    // Trạng thái vòng đời hiển thị cho khách hàng của hồ sơ vay.
     private ApplicationStatus applicationStatus;
+
     @Column(name = "submission_channel")
+
     private String submissionChannel;
+
     @Column(name = "submitted_at")
+
     private Instant submittedAt;
+
     @Column(name = "created_at")
+
     private Instant createdAt;
+
     @Column(name = "updated_at")
+
     private Instant updatedAt;
+
     @Version
+
+    // Phiên bản optimistic locking để chặn cập nhật từ màn hình cũ.
     private long version;
+
     @OneToOne(mappedBy = "loanApplication", cascade = CascadeType.ALL, orphanRemoval = true)
+
     private ApplicantProfile applicantProfile;
 
     protected LoanApplication() {

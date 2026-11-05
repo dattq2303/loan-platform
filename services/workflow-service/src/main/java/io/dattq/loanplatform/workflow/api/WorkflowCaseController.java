@@ -1,34 +1,23 @@
 package io.dattq.loanplatform.workflow.api;
 
-import io.dattq.loanplatform.workflow.domain.WorkflowCase;
-import io.dattq.loanplatform.workflow.repository.WorkflowCaseRepository;
-import org.springframework.http.HttpStatus;
+import io.dattq.loanplatform.workflow.service.WorkflowCaseQueryService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.time.Instant;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/workflow-cases")
 public class WorkflowCaseController {
-    private final WorkflowCaseRepository repository;
+    private final WorkflowCaseQueryService workflowCaseQueryService;
 
-    public WorkflowCaseController(WorkflowCaseRepository repository) {
-        this.repository = repository;
+    public WorkflowCaseController(WorkflowCaseQueryService workflowCaseQueryService) {
+        this.workflowCaseQueryService = workflowCaseQueryService;
     }
 
     @GetMapping("/{applicationId}")
     public WorkflowCaseView get(@PathVariable("applicationId") UUID applicationId) {
-        WorkflowCase workflowCase = repository.findByApplicationId(applicationId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Workflow case not found"));
-        return new WorkflowCaseView(workflowCase.getApplicationId(), workflowCase.getApplicationNo(),
-                workflowCase.getCustomerId(), workflowCase.getCaseStatus(), workflowCase.getCreatedAt());
+        return workflowCaseQueryService.getByApplicationId(applicationId);
     }
-
-    public record WorkflowCaseView(UUID applicationId, String applicationNo, String customerId,
-                                   String status, Instant createdAt) { }
 }

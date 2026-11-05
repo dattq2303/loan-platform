@@ -8,23 +8,43 @@ import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+/**
+ * Cấu hình sản phẩm vay, bao gồm hạn mức và kỳ hạn được phép đăng ký.
+ */
 @Entity
 @Table(name = "loan_product")
 public class LoanProduct {
     @Id
     @Column(name = "product_id")
+
     private UUID productId;
+
     @Column(name = "product_code")
+
+    // Mã sản phẩm ổn định được client gửi trong yêu cầu tạo hoặc sửa bản nháp.
     private String productCode;
+
+
     private String name;
+
     @Column(name = "min_amount")
+
     private BigDecimal minAmount;
+
     @Column(name = "max_amount")
+
     private BigDecimal maxAmount;
+
     @Column(name = "min_tenor_months")
+
     private int minTenorMonths;
+
     @Column(name = "max_tenor_months")
+
     private int maxTenorMonths;
+
+
+    // Chỉ sản phẩm đang hoạt động mới được tạo hoặc gửi hồ sơ vay.
     private boolean active;
 
     protected LoanProduct() {

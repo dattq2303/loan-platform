@@ -11,24 +11,42 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
+/**
+ * Ảnh chụp thông tin người vay tại thời điểm tạo hoặc cập nhật hồ sơ vay.
+ */
 @Entity
 @Table(name = "applicant_profile")
 public class ApplicantProfile {
     @Id
     @Column(name = "applicant_profile_id")
+
+    // Định danh kỹ thuật của ảnh chụp hồ sơ người vay.
     private UUID applicantProfileId;
+
     @OneToOne
     @JoinColumn(name = "loan_application_id", nullable = false, unique = true)
+
+    // Hồ sơ vay sở hữu ảnh chụp này; không phải dữ liệu khách hàng dùng chung.
     private LoanApplication loanApplication;
+
     @Column(name = "customer_id")
+
     private String customerId;
+
     @Column(name = "full_name")
+
     private String fullName;
+
     @Column(name = "date_of_birth")
+
     private LocalDate dateOfBirth;
+
     @Column(name = "monthly_income")
+
     private BigDecimal monthlyIncome;
+
     @Column(name = "employment_type")
+
     private String employmentType;
 
     protected ApplicantProfile() {

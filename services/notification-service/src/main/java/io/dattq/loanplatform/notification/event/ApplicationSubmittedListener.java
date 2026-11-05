@@ -39,7 +39,15 @@ public class ApplicationSubmittedListener {
 
     private static final String APPLICATION_SUBMITTED = "APPLICATION_SUBMITTED";
 
-    private record ApplicationSubmittedEvent(UUID eventId, String eventType, UUID applicationId,
-                                             String applicationNo, String customerId) {
+    /**
+     * Phần dữ liệu tối thiểu để tạo thông báo sau khi khách hàng nộp hồ sơ.
+     */
+    private record ApplicationSubmittedEvent(
+            UUID eventId,
+            String eventType,
+            UUID applicationId,
+            String applicationNo,
+            String customerId
+    ) {
     }
 }

@@ -7,6 +7,9 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+/**
+ * Thông tin người vay được chụp lại cùng hồ sơ vay, không phải customer master dùng chung.
+ */
 public record ApplicantRequest(
         @NotBlank String customerId,
         @NotBlank String fullName,
